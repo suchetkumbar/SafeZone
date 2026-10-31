@@ -62,7 +62,7 @@ class ForensicsAnalyzer:
         target_roi: Optional[Tuple[float, float, float, float]] = None,
         ref_image_path: Optional[str] = None,
         target_category: str = "both",
-        proximity_radius_ratio: float = 0.25,
+        proximity_radius_ratio: float = 0.38,
         visual_matcher: Optional[VisualMatcher] = None
     ):
         self.target_roi = target_roi

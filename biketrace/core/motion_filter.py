@@ -11,7 +11,7 @@ class FastMotionFilter:
     """
     def __init__(
         self,
-        threshold: float = 0.005,
+        threshold: float = 0.002,
         target_roi: Optional[Tuple[float, float, float, float]] = None,
         downsample_width: int = 320,
         downsample_height: int = 180,

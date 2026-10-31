@@ -36,11 +36,11 @@ class ForensicsConfig:
     fast_mode: bool = True         # Enable two-stage motion gating + adaptive stride
     base_fps_stride: int = 2       # Scan every Nth frame when quiet (e.g. 2 means ~12-15 fps reduction)
     motion_gate_enabled: bool = True # Fast MOG2 background subtraction filter
-    motion_threshold: float = 0.005 # Fraction of pixels that must change to trigger detection
+    motion_threshold: float = 0.002 # Fraction of pixels that must change to trigger detection
     roi_motion_only: bool = True   # When ROI is set, check motion specifically in the ROI
     
     # Forensics & Incident Analysis
-    proximity_radius_ratio: float = 0.35 # Proximity threshold as ratio of frame dimension
+    proximity_radius_ratio: float = 0.38 # Proximity threshold as ratio of frame dimension
     interaction_frames_min: int = 3      # Minimum co-occurring frames to count as an interaction
     pre_event_seconds: float = 5.0       # Seconds of video to capture before incident
     post_event_seconds: float = 8.0      # Seconds of video to capture after incident
