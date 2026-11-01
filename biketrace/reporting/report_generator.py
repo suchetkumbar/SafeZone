@@ -1,4 +1,4 @@
-"""Generates comprehensive investigative reports in JSON, HTML, and Markdown with embedded evidence."""
+﻿"""Generates comprehensive investigative reports in JSON, HTML, and Markdown with embedded evidence."""
 import os
 import json
 import base64
@@ -127,7 +127,7 @@ class ReportGenerator:
     def _to_markdown(self, report: ForensicReport) -> str:
         """Render report in GitHub Flavored Markdown."""
         lines = [
-            "# 🚨 CCTV FORENSIC INCIDENT REPORT: STOLEN 2-WHEELER INVESTIGATION",
+            "# ðŸš¨ CCTV FORENSIC INCIDENT REPORT: STOLEN 2-WHEELER INVESTIGATION",
             "",
             f"**Incident Status:** `{report.status}`  ",
             f"**Total Footage Processed:** `{format_seconds(report.total_duration_sec)}` ({report.total_frames_analyzed} frames)  ",
@@ -179,351 +179,144 @@ class ReportGenerator:
         return "\n".join(lines)
 
     def _to_html(self, report: ForensicReport) -> str:
-        """Render modern, responsive standalone HTML dossier with embedded base64 images."""
-        b64_bike = image_to_base64(report.target_initial_crop)
-        b64_suspect = image_to_base64(report.primary_suspect.best_snapshot) if report.primary_suspect else ""
-        b64_parked = image_to_base64(report.keyframe_parked)
-        b64_approach = image_to_base64(report.keyframe_approach)
-        b64_interaction = image_to_base64(report.keyframe_interaction)
-        b64_departure = image_to_base64(report.keyframe_departure)
-        b64_aftermath = image_to_base64(report.keyframe_aftermath)
+        """Render a concise, responsive, self-contained monochrome evidence report."""
+        esc = lambda value: html.escape(str(value))
+        image = lambda value, alt: (
+            f'<img src="data:image/jpeg;base64,{value}" alt="{esc(alt)}">' if value else ""
+        )
 
-        timeline_rows = "".join([
+        timeline_rows = "".join(
             f"""<tr>
-                <td class="time-col"><code>{ev.get('time_str', 'N/A')}</code></td>
-                <td><span class="badge badge-{ev.get('type', 'DEFAULT')}">{ev.get('type', '')}</span></td>
-                <td>{html.escape(str(ev.get('description', '')))}</td>
+                <td class="time">{esc(event.get('time_str', 'N/A'))}</td>
+                <td><span class="event-tag">{esc(event.get('type', 'Event'))}</span></td>
+                <td>{esc(event.get('description', ''))}</td>
             </tr>"""
-            for ev in report.timeline_events
-        ])
+            for event in report.timeline_events
+        )
+        if not timeline_rows:
+            timeline_rows = '<tr><td colspan="3" class="empty">No timeline events were recorded.</td></tr>'
 
-        suspect_block = ""
-        if report.primary_suspect and b64_suspect:
-            suspect_block = f"""
-            <div class="evidence-card suspect-card">
-                <div class="card-header">
-                    <h3>🚨 Primary Suspect Detected (Track #{report.primary_suspect.track_id})</h3>
-                    <span class="conf-tag">{report.primary_suspect.confidence_score * 100:.1f}% Confidence</span>
-                </div>
-                <div class="card-body grid-2">
-                    <div class="crop-frame">
-                        <img src="data:image/jpeg;base64,{b64_suspect}" alt="Primary Suspect" />
-                        <span class="caption">Sharpest Crop (Laplacian {report.primary_suspect.best_sharpness:.1f})</span>
-                    </div>
-                    <div class="details">
-                        <p><strong>First Contact:</strong> <code>{format_seconds(report.primary_suspect.first_contact_ts)}</code></p>
-                        <p><strong>Departure Contact:</strong> <code>{format_seconds(report.primary_suspect.last_contact_ts)}</code></p>
-                        <p><strong>Total Interaction:</strong> {report.primary_suspect.interaction_duration:.1f} seconds</p>
-                        <p><strong>Activity:</strong> {report.primary_suspect.action_description}</p>
-                        <p class="callout">This individual was physically proximate to the vehicle at the moment it departed the parking space.</p>
-                    </div>
-                </div>
-            </div>
-            """
-        elif report.primary_suspect:
-            suspect_block = f"""
-            <div class="evidence-card suspect-card">
-                <h3>🚨 Primary Suspect Track #{report.primary_suspect.track_id}</h3>
-                <p>Confidence: {report.primary_suspect.confidence_score * 100:.1f}% | Activity: {report.primary_suspect.action_description}</p>
-            </div>
-            """
-        else:
-            suspect_block = "<div class='notice'>No individual was detected in immediate contact with the bike.</div>"
-
-        bike_block = ""
-        if b64_bike:
-            bike_block = f"""
-            <div class="crop-frame mini">
-                <img src="data:image/jpeg;base64,{b64_bike}" alt="Target Bike" />
-                <span class="caption">Locked Target 2-Wheeler</span>
-            </div>
-            """
-
-        keyframes_html = ""
-        kf_list = [
-            ("1. Initial Parked State", b64_parked),
-            ("2. Suspect Approach", b64_approach),
-            ("3. Physical Interaction", b64_interaction),
-            ("4. Bike Departure", b64_departure),
-            ("5. Empty Parking Spot", b64_aftermath),
+        keyframes = [
+            ("Parked", report.keyframe_parked),
+            ("Approach", report.keyframe_approach),
+            ("Interaction", report.keyframe_interaction),
+            ("Departure", report.keyframe_departure),
+            ("Aftermath", report.keyframe_aftermath),
         ]
-        for title, b64_img in kf_list:
-            if b64_img:
-                keyframes_html += f"""
-                <div class="gallery-item">
-                    <h4>{title}</h4>
-                    <img src="data:image/jpeg;base64,{b64_img}" alt="{title}" />
-                </div>
-                """
+        gallery = "".join(
+            f'<figure class="frame">{image(image_to_base64(frame), title)}<figcaption>{esc(title)}</figcaption></figure>'
+            for title, frame in keyframes if frame is not None and frame.size
+        )
+        if not gallery:
+            gallery = '<p class="empty">No keyframes were captured.</p>'
 
-        html = f"""<!DOCTYPE html>
+        bike_image = image_to_base64(report.target_initial_crop)
+        target_evidence = (
+            f'<figure class="portrait">{image(bike_image, "Target vehicle")}'
+            '<figcaption>Target vehicle</figcaption></figure>' if bike_image else ""
+        )
+        suspect = report.primary_suspect
+        suspect_image = image_to_base64(suspect.best_snapshot) if suspect else ""
+        if suspect:
+            suspect_details = f"""
+                <div class="profile">
+                    <div class="profile-heading"><h3>Track {esc(suspect.track_id)}</h3>
+                    <span class="confidence">{suspect.confidence_score * 100:.1f}% confidence</span></div>
+                    <dl>
+                        <div><dt>First contact</dt><dd>{esc(format_seconds(suspect.first_contact_ts))}</dd></div>
+                        <div><dt>Last contact</dt><dd>{esc(format_seconds(suspect.last_contact_ts))}</dd></div>
+                        <div><dt>Interaction</dt><dd>{suspect.interaction_duration:.1f} seconds</dd></div>
+                        <div><dt>Observed activity</dt><dd>{esc(suspect.action_description)}</dd></div>
+                    </dl>
+                </div>"""
+            suspect_evidence = (
+                f'<figure class="portrait">{image(suspect_image, "Suspect")}'
+                '<figcaption>Best available frame</figcaption></figure>' if suspect_image else ""
+            )
+        else:
+            suspect_details = '<p class="empty">No suspect was identified in the analyzed footage.</p>'
+            suspect_evidence = ""
+
+        departure = format_seconds(report.departure_ts) if report.departure_ts > 0 else "Not detected"
+        return f"""<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CCTV Forensic Dossier - Stolen Bike Investigation</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Incident report | BikeTrace</title>
 <style>
-    :root {{
-        --bg: #0f172a;
-        --card: #1e293b;
-        --border: #334155;
-        --accent: #ef4444;
-        --text: #f8fafc;
-        --muted: #94a3b8;
-        --success: #22c55e;
-        --warning: #f59e0b;
-        --blue: #38bdf8;
-    }}
-    body {{
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        background: var(--bg);
-        color: var(--text);
-        margin: 0;
-        padding: 24px;
-        line-height: 1.5;
-    }}
-    .container {{
-        max-width: 1100px;
-        margin: 0 auto;
-    }}
-    header {{
-        border-bottom: 2px solid var(--border);
-        padding-bottom: 20px;
-        margin-bottom: 30px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-    }}
-    h1 {{
-        margin: 0 0 6px 0;
-        font-size: 26px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }}
-    .status-badge {{
-        padding: 6px 14px;
-        border-radius: 9999px;
-        font-weight: 700;
-        text-transform: uppercase;
-        font-size: 13px;
-        background: #991b1b;
-        color: #fef2f2;
-        letter-spacing: 0.5px;
-    }}
-    .grid-summary {{
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 16px;
-        margin-bottom: 24px;
-    }}
-    .summary-card {{
-        background: var(--card);
-        border: 1px solid var(--border);
-        border-radius: 10px;
-        padding: 16px;
-    }}
-    .summary-card h4 {{
-        margin: 0 0 6px 0;
-        color: var(--muted);
-        font-size: 13px;
-        text-transform: uppercase;
-    }}
-    .summary-card .val {{
-        font-size: 20px;
-        font-weight: 700;
-        color: var(--text);
-    }}
-    .evidence-card {{
-        background: var(--card);
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        padding: 20px;
-        margin-bottom: 24px;
-    }}
-    .suspect-card {{
-        border-left: 5px solid var(--accent);
-    }}
-    .card-header {{
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 16px;
-    }}
-    .conf-tag {{
-        background: #dc2626;
-        padding: 4px 10px;
-        border-radius: 6px;
-        font-weight: bold;
-        font-size: 14px;
-    }}
-    .grid-2 {{
-        display: grid;
-        grid-template-columns: 240px 1fr;
-        gap: 20px;
-    }}
-    @media (max-width: 768px) {{
-        .grid-2 {{ grid-template-columns: 1fr; }}
-    }}
-    .crop-frame {{
-        background: #020617;
-        border: 2px solid #ef4444;
-        border-radius: 8px;
-        overflow: hidden;
-        text-align: center;
-    }}
-    .crop-frame img {{
-        width: 100%;
-        height: auto;
-        display: block;
-    }}
-    .crop-frame .caption {{
-        display: block;
-        padding: 6px;
-        font-size: 11px;
-        color: var(--muted);
-        background: #0f172a;
-    }}
-    .callout {{
-        background: #3f1212;
-        border-left: 3px solid #ef4444;
-        padding: 10px;
-        border-radius: 4px;
-        margin-top: 14px;
-        font-size: 14px;
-    }}
-    .gallery-grid {{
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 16px;
-    }}
-    .gallery-item {{
-        background: #0b1120;
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        padding: 10px;
-    }}
-    .gallery-item h4 {{
-        margin: 0 0 8px 0;
-        font-size: 14px;
-        color: var(--blue);
-    }}
-    .gallery-item img {{
-        width: 100%;
-        border-radius: 4px;
-        display: block;
-    }}
-    table {{
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 10px;
-        font-size: 14px;
-    }}
-    th, td {{
-        padding: 10px 14px;
-        border-bottom: 1px solid var(--border);
-        text-align: left;
-    }}
-    th {{
-        background: #090d16;
-        color: var(--muted);
-        font-weight: 600;
-    }}
-    .badge {{
-        padding: 3px 8px;
-        border-radius: 4px;
-        font-size: 11px;
-        font-weight: bold;
-    }}
-    .badge-TARGET_LOCKED {{ background: #0369a1; color: #e0f2fe; }}
-    .badge-PERSON_APPROACHED {{ background: #ca8a04; color: #fefce8; }}
-    .badge-DEPARTURE_DETECTED {{ background: #dc2626; color: #fef2f2; }}
-    .badge-TARGET_DISAPPEARED {{ background: #b91c1c; color: #fef2f2; }}
-    /* Restrained monochrome report styling; embedded CCTV frames retain their color. */
-    :root {{ --bg:#fff; --card:#fff; --border:#d8d8d8; --accent:#111; --text:#111;
-        --muted:#666; --success:#111; --warning:#111; --blue:#111; }}
-    body {{ background:#fff !important; color:#111 !important; padding:32px 20px; }}
-    .summary-card,.evidence-card,.gallery-item {{ background:#fff !important; border:1px solid #d8d8d8 !important;
-        border-radius:2px !important; box-shadow:none !important; }}
-    .status-badge,.conf-tag,.badge {{ background:#fff !important; color:#111 !important;
-        border:1px solid #999 !important; border-radius:2px !important; }}
-    .suspect-card {{ border-left:2px solid #111 !important; }}
-    .crop-frame {{ background:#fff !important; border:1px solid #aaa !important; border-radius:0 !important; }}
-    .crop-frame .caption {{ background:#fff !important; color:#555 !important; }}
-    .gallery-item h4 {{ color:#111 !important; }}
-    .gallery-item img,.crop-frame img {{ filter:none; }}
-    th {{ background:#f4f4f4 !important; color:#111 !important; }}
-    th,td {{ border-color:#ddd !important; }}
-    .callout {{ background:#fff !important; border-left:2px solid #777 !important; }}
-    @media print {{ body {{ padding:0; }} .container {{ max-width:none; }} }}
+    :root {{ color-scheme: light; --ink:#171717; --muted:#686868; --line:#dedede; --soft:#f6f6f5; }}
+    * {{ box-sizing:border-box; }}
+    body {{ margin:0; background:#fff; color:var(--ink); font:15px/1.55 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }}
+    main {{ width:min(100% - 40px, 1040px); margin:0 auto; padding:48px 0 64px; }}
+    .masthead {{ display:flex; justify-content:space-between; gap:24px; align-items:center; padding-bottom:16px; border-bottom:1px solid var(--line); }}
+    .wordmark {{ font-size:12px; letter-spacing:.13em; font-weight:650; text-transform:uppercase; }}
+    .document-type {{ color:var(--muted); font-size:13px; }}
+    .intro {{ display:flex; justify-content:space-between; align-items:flex-end; gap:24px; padding:32px 0 28px; }}
+    h1 {{ margin:0; font-size:clamp(30px,5vw,42px); line-height:1.12; letter-spacing:-.045em; font-weight:620; }}
+    .subhead {{ margin:9px 0 0; color:var(--muted); }}
+    .status {{ flex:none; border:1px solid var(--line); border-radius:999px; padding:6px 11px; font-size:11px; letter-spacing:.08em; font-weight:650; text-transform:uppercase; }}
+    .metrics {{ display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); border:1px solid var(--line); border-radius:8px; overflow:hidden; margin-bottom:38px; }}
+    .metric {{ min-height:91px; padding:16px 18px; border-right:1px solid var(--line); }}
+    .metric:last-child {{ border:0; }}
+    .label,dt {{ display:block; color:var(--muted); font-size:11px; letter-spacing:.07em; text-transform:uppercase; }}
+    .value {{ display:block; margin-top:7px; font-size:18px; font-weight:590; letter-spacing:-.02em; }}
+    section {{ margin-top:36px; }}
+    .section-heading {{ display:flex; align-items:baseline; justify-content:space-between; gap:16px; margin-bottom:14px; padding-bottom:10px; border-bottom:1px solid var(--line); }}
+    h2 {{ margin:0; font-size:17px; font-weight:600; letter-spacing:-.02em; }}
+    .section-note {{ color:var(--muted); font-size:12px; }}
+    .evidence-grid {{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }}
+    .evidence-panel {{ min-width:0; border:1px solid var(--line); border-radius:8px; overflow:hidden; }}
+    .evidence-content {{ display:flex; gap:18px; padding:16px; align-items:flex-start; }}
+    figure {{ margin:0; }}
+    .portrait {{ flex:0 0 38%; min-width:120px; }}
+    .portrait img {{ display:block; width:100%; max-height:270px; object-fit:contain; background:var(--soft); }}
+    figcaption {{ padding-top:7px; color:var(--muted); font-size:12px; }}
+    .profile {{ flex:1; min-width:0; }}
+    .profile-heading {{ display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px; }}
+    h3 {{ margin:0; font-size:15px; font-weight:600; }}
+    .confidence {{ color:var(--muted); font-size:12px; }}
+    dl {{ margin:12px 0 0; }}
+    dl div {{ padding:8px 0; border-top:1px solid var(--line); }}
+    dd {{ margin:2px 0 0; }}
+    .gallery {{ display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; }}
+    .frame {{ min-width:0; padding:8px; border:1px solid var(--line); border-radius:7px; }}
+    .frame img {{ display:block; width:100%; aspect-ratio:16/10; object-fit:contain; background:var(--soft); }}
+    .frame figcaption {{ color:var(--ink); font-weight:550; }}
+    .table-wrap {{ overflow-x:auto; border:1px solid var(--line); border-radius:8px; }}
+    table {{ width:100%; border-collapse:collapse; text-align:left; }}
+    th {{ padding:10px 14px; background:var(--soft); color:var(--muted); font-size:11px; font-weight:600; letter-spacing:.07em; text-transform:uppercase; }}
+    td {{ padding:12px 14px; border-top:1px solid var(--line); vertical-align:top; }}
+    .time {{ width:145px; white-space:nowrap; font-variant-numeric:tabular-nums; }}
+    .event-tag {{ display:inline-block; padding:2px 7px; border:1px solid var(--line); border-radius:4px; font-size:11px; }}
+    .empty {{ padding:16px; color:var(--muted); }}
+    footer {{ margin-top:42px; padding-top:14px; border-top:1px solid var(--line); color:var(--muted); font-size:12px; }}
+    @media(max-width:700px) {{ main {{ width:min(100% - 28px,1040px); padding-top:24px; }} .intro {{ align-items:flex-start; flex-direction:column; }} .metrics {{ grid-template-columns:repeat(2,minmax(0,1fr)); }} .metric:nth-child(2) {{ border-right:0; }} .metric:nth-child(-n+2) {{ border-bottom:1px solid var(--line); }} .evidence-grid {{ grid-template-columns:1fr; }} }}
+    @media(max-width:430px) {{ .evidence-content {{ flex-direction:column; }} .portrait {{ width:100%; max-width:260px; flex-basis:auto; }} .portrait img {{ max-height:340px; }} }}
+    @media print {{ main {{ width:100%; padding:0; }} .evidence-panel,.frame,.metrics {{ break-inside:avoid; }} }}
 </style>
 </head>
 <body>
-<div class="container">
-    <header>
-        <div>
-            <h1>📹 CCTV Forensic Investigation Report</h1>
-            <p style="color:var(--muted); margin:0;">Stolen 2-Wheeler Suspect Identification & Timeline Reconstruction</p>
-        </div>
-        <div>
-            <span class="status-badge">{report.status}</span>
-        </div>
-    </header>
-
-    <div class="grid-summary">
-        <div class="summary-card">
-            <h4>Target 2-Wheeler</h4>
-            <div class="val">Track #{report.target_bike_id or 'N/A'}</div>
-            {bike_block}
-        </div>
-        <div class="summary-card">
-            <h4>Last Stationary</h4>
-            <div class="val">{format_seconds(report.last_stationary_ts)}</div>
-            <small style="color:var(--muted)">Verified resting in zone</small>
-        </div>
-        <div class="summary-card">
-            <h4>Departure / Incident</h4>
-            <div class="val" style="color:var(--accent)">{format_seconds(report.departure_ts) if report.departure_ts > 0 else 'N/A'}</div>
-            <small style="color:var(--muted)">Moment vehicle moved/vanished</small>
-        </div>
-        <div class="summary-card">
-            <h4>Footage Duration</h4>
-            <div class="val">{format_seconds(report.total_duration_sec)}</div>
-            <small style="color:var(--muted)">{report.total_frames_analyzed} frames analyzed</small>
-        </div>
+<main>
+    <div class="masthead"><span class="wordmark">BikeTrace</span><span class="document-type">CCTV incident analysis</span></div>
+    <header class="intro"><div><h1>Incident report</h1><p class="subhead">Vehicle departure and associated activity</p></div><span class="status">{esc(report.status)}</span></header>
+    <div class="metrics" aria-label="Incident summary">
+        <div class="metric"><span class="label">Target vehicle</span><span class="value">{f'Track {esc(report.target_bike_id)}' if report.target_bike_id else 'Not identified'}</span></div>
+        <div class="metric"><span class="label">Last stationary</span><span class="value">{esc(format_seconds(report.last_stationary_ts))}</span></div>
+        <div class="metric"><span class="label">Departure</span><span class="value">{esc(departure)}</span></div>
+        <div class="metric"><span class="label">Footage analyzed</span><span class="value">{esc(format_seconds(report.total_duration_sec))}</span></div>
     </div>
-
-    {suspect_block}
-
-    <div class="evidence-card">
-        <h3>🔍 Chronological Keyframe Progression</h3>
-        <div class="gallery-grid">
-            {keyframes_html}
+    <section aria-labelledby="evidence-title">
+        <div class="section-heading"><h2 id="evidence-title">People and vehicle</h2><span class="section-note">Color frames preserved from source footage</span></div>
+        <div class="evidence-grid">
+            <article class="evidence-panel"><div class="evidence-content">{target_evidence}<div class="profile"><h3>Target vehicle</h3><dl><div><dt>Track</dt><dd>{esc(report.target_bike_id or 'Not identified')}</dd></div><div><dt>Last stationary</dt><dd>{esc(format_seconds(report.last_stationary_ts))}</dd></div><div><dt>Departure</dt><dd>{esc(departure)}</dd></div></dl></div></div></article>
+            <article class="evidence-panel"><div class="evidence-content">{suspect_evidence}{suspect_details}</div></article>
         </div>
-    </div>
-
-    <div class="evidence-card">
-        <h3>⏱️ Forensic Incident Timeline</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th style="width: 140px;">Timecode</th>
-                    <th style="width: 200px;">Event Category</th>
-                    <th>Forensic Description</th>
-                </tr>
-            </thead>
-            <tbody>
-                {timeline_rows}
-            </tbody>
-        </table>
-    </div>
-
-    <footer style="margin-top: 40px; text-align: center; color: var(--muted); font-size: 13px;">
-        Generated automatically by BikeTrace CCTV Forensics AI Toolkit &bull; Suitable for law enforcement hand-off
-    </footer>
-</div>
+    </section>
+    <section aria-labelledby="frames-title"><div class="section-heading"><h2 id="frames-title">Keyframes</h2><span class="section-note">{report.total_frames_analyzed} frames analyzed</span></div><div class="gallery">{gallery}</div></section>
+    <section aria-labelledby="timeline-title"><div class="section-heading"><h2 id="timeline-title">Timeline</h2></div><div class="table-wrap"><table><thead><tr><th>Time</th><th>Event</th><th>Description</th></tr></thead><tbody>{timeline_rows}</tbody></table></div></section>
+    <footer>Generated by BikeTrace CCTV Forensics</footer>
+</main>
 </body>
-</html>
-"""
-        return html
+</html>"""
