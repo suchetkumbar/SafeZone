@@ -18,46 +18,46 @@ TEST_CASES = [
     {
         "id": "theft_attempt",
         "name": "Case 1: Residential Compound Motorcycle Theft Attempt",
-        "source": "test_videos/real_cctv_theft_attempt.webm",
+        "source": "tests/videos/real_cctv_theft_attempt.webm",
         "category": "motorcycle",
         "roi": (500, 150, 950, 500), # Region where the parked electric motorcycle is located
         "ref_image": None,
         "stride": 2,
         "fast_mode": True,
-        "output_dir": "test_results/case1_theft_attempt"
+        "output_dir": "tests/results/case1_theft_attempt"
     },
     {
         "id": "intel_bicycle",
         "name": "Case 2: Intel IoT Surveillance Street & Bicycle Feed",
-        "source": "test_videos/intel_bicycle_surveillance.mp4",
+        "source": "tests/videos/cctv_traffic_intersection.webm",
         "category": "bicycle",
         "roi": (500, 10, 768, 120), # Street path where bicycle appears
         "ref_image": None,
         "stride": 2,
         "fast_mode": True,
-        "output_dir": "test_results/case2_intel_bicycle"
+        "output_dir": "tests/results/case2_intel_bicycle"
     },
     {
         "id": "electric_moto",
         "name": "Case 3: Overhead Security Camera 2-Wheeler Intercept",
-        "source": "test_videos/real_cctv_electric_moto.webm",
+        "source": "tests/videos/real_cctv_electric_moto.webm",
         "category": "both",
         "roi": (150, 250, 450, 500), # Street transit lane where 2-wheeler appears
         "ref_image": None,
         "stride": 1,
         "fast_mode": False,
-        "output_dir": "test_results/case3_electric_moto"
+        "output_dir": "tests/results/case3_electric_moto"
     },
     {
         "id": "synthetic_theft_scenario",
         "name": "Case 4: End-to-End Parking Lot CCTV Theft Benchmark",
-        "source": "sample_test_cctv.mp4",
+        "source": "tests/videos/sample_test_cctv.mp4",
         "category": "motorcycle",
         "roi": (380, 200, 680, 450), # Designated parking bay
         "ref_image": None,
         "stride": 2,
         "fast_mode": True,
-        "output_dir": "test_results/case4_parking_theft"
+        "output_dir": "tests/results/case4_parking_theft"
     }
 ]
 
@@ -68,7 +68,7 @@ def run_benchmark():
     console.print("[bold magenta]═══════════════════════════════════════════════════════════════════════════[/bold magenta]\n")
 
     benchmark_summary = []
-    base_out = Path("test_results")
+    base_out = Path("tests/results")
     base_out.mkdir(exist_ok=True)
 
     for tc in TEST_CASES:
@@ -170,7 +170,7 @@ def _render_master_results(summary):
     console.print("\n")
 
     # Write BENCHMARK_REPORT.json
-    with open("test_results/benchmark_summary.json", "w", encoding="utf-8") as f:
+    with open("tests/results/benchmark_summary.json", "w", encoding="utf-8") as f:
         json.dump(summary, f, indent=2)
 
     # Write BENCHMARK_REPORT.md
@@ -219,7 +219,7 @@ def _render_master_results(summary):
             ""
         ])
 
-    with open("test_results/BENCHMARK_REPORT.md", "w", encoding="utf-8") as f:
+    with open("tests/results/BENCHMARK_REPORT.md", "w", encoding="utf-8") as f:
         f.write("\n".join(md_lines))
 
     console.print("[bold green]✅ Master benchmark report generated in: test_results/BENCHMARK_REPORT.md and test_results/benchmark_summary.json[/bold green]")

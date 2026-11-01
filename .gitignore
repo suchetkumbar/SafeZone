@@ -16,5 +16,11 @@ build/
 !test_zidane.jpg
 forensics_output/
 test_output/
+output/*
+!output/.gitkeep
+data/*
+!data/.gitkeep
+!tests/
+!tests/**
 .env
 .venv

@@ -8,7 +8,7 @@ from biketrace.pipeline import ForensicsPipeline
 
 
 def test_full_forensics_pipeline(tmp_path):
-    video_path = "sample_test_cctv.mp4"
+    video_path = "tests/videos/sample_test_cctv.mp4"
     assert os.path.exists(video_path), "sample_test_cctv.mp4 should exist"
 
     out_dir = tmp_path / "e2e_output"

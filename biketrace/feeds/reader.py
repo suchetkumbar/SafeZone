@@ -52,7 +52,13 @@ class FeedReader:
     High-performance, multi-format CCTV feed reader.
     Handles single video files, directories of DVR split segments, RTSP streams, and webcams.
     """
-    VIDEO_EXTS = {".mp4", ".avi", ".mkv", ".mov", ".flv", ".ts", ".h264", ".h265", ".wmv", ".m4v"}
+    # OpenCV/FFmpeg decodes the container/codec; these extensions cover common DVR exports.
+    VIDEO_EXTS = {
+        ".mp4", ".avi", ".mkv", ".mov", ".flv", ".ts", ".m2ts", ".mts",
+        ".h264", ".h265", ".264", ".265", ".webm", ".wmv", ".m4v",
+        ".mpeg", ".mpg", ".mpe", ".3gp", ".3g2", ".asf", ".vob", ".dav",
+        ".mjpeg", ".mjpg", ".mpg4",
+    }
     IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".bmp", ".webp", ".tiff"}
 
     def __init__(

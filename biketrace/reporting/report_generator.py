@@ -2,6 +2,7 @@
 import os
 import json
 import base64
+import html
 import cv2
 import numpy as np
 from pathlib import Path
@@ -191,7 +192,7 @@ class ReportGenerator:
             f"""<tr>
                 <td class="time-col"><code>{ev.get('time_str', 'N/A')}</code></td>
                 <td><span class="badge badge-{ev.get('type', 'DEFAULT')}">{ev.get('type', '')}</span></td>
-                <td>{ev.get('description', '')}</td>
+                <td>{html.escape(str(ev.get('description', '')))}</td>
             </tr>"""
             for ev in report.timeline_events
         ])
@@ -439,6 +440,23 @@ class ReportGenerator:
     .badge-PERSON_APPROACHED {{ background: #ca8a04; color: #fefce8; }}
     .badge-DEPARTURE_DETECTED {{ background: #dc2626; color: #fef2f2; }}
     .badge-TARGET_DISAPPEARED {{ background: #b91c1c; color: #fef2f2; }}
+    /* Restrained monochrome report styling; embedded CCTV frames retain their color. */
+    :root {{ --bg:#fff; --card:#fff; --border:#d8d8d8; --accent:#111; --text:#111;
+        --muted:#666; --success:#111; --warning:#111; --blue:#111; }}
+    body {{ background:#fff !important; color:#111 !important; padding:32px 20px; }}
+    .summary-card,.evidence-card,.gallery-item {{ background:#fff !important; border:1px solid #d8d8d8 !important;
+        border-radius:2px !important; box-shadow:none !important; }}
+    .status-badge,.conf-tag,.badge {{ background:#fff !important; color:#111 !important;
+        border:1px solid #999 !important; border-radius:2px !important; }}
+    .suspect-card {{ border-left:2px solid #111 !important; }}
+    .crop-frame {{ background:#fff !important; border:1px solid #aaa !important; border-radius:0 !important; }}
+    .crop-frame .caption {{ background:#fff !important; color:#555 !important; }}
+    .gallery-item h4 {{ color:#111 !important; }}
+    .gallery-item img,.crop-frame img {{ filter:none; }}
+    th {{ background:#f4f4f4 !important; color:#111 !important; }}
+    th,td {{ border-color:#ddd !important; }}
+    .callout {{ background:#fff !important; border-left:2px solid #777 !important; }}
+    @media print {{ body {{ padding:0; }} .container {{ max-width:none; }} }}
 </style>
 </head>
 <body>

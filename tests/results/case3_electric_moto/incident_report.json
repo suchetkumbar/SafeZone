@@ -1,0 +1,55 @@
+{
+  "incident_status": "STOLEN_OR_DEPARTED",
+  "target_bike": {
+    "track_id": 3,
+    "initial_bounding_box": [
+      223,
+      342,
+      276,
+      422
+    ],
+    "last_stationary_timestamp": 12.800000000000047,
+    "last_stationary_time_formatted": "00:00:12.800",
+    "departure_timestamp": 12.850000000000048,
+    "departure_time_formatted": "00:00:12.850"
+  },
+  "investigation_metrics": {
+    "total_frames_analyzed": 428,
+    "total_duration_seconds": 21.35000000000017,
+    "duration_formatted": "00:00:21.350"
+  },
+  "primary_suspect": {
+    "track_id": 2,
+    "first_contact_ts": 11.700000000000031,
+    "first_contact_formatted": "00:00:11.700",
+    "last_contact_ts": 18.800000000000132,
+    "last_contact_formatted": "00:00:18.800",
+    "interaction_duration_seconds": 7.100000000000101,
+    "suspicion_confidence_score": 1.0,
+    "action": "Interacted with bike at departure"
+  },
+  "associated_persons": [],
+  "timeline": [
+    {
+      "timestamp": 11.700000000000031,
+      "time_str": "00:00:11.700",
+      "frame_idx": 234,
+      "type": "TARGET_LOCKED",
+      "description": "Target bicycle locked (Track ID #3)"
+    },
+    {
+      "timestamp": 11.700000000000031,
+      "time_str": "00:00:11.700",
+      "frame_idx": 234,
+      "type": "PERSON_APPROACHED",
+      "description": "Person (ID #2) entered bike interaction zone (dist: 0.0px)"
+    },
+    {
+      "timestamp": 12.850000000000048,
+      "time_str": "00:00:12.850",
+      "frame_idx": 257,
+      "type": "TARGET_DISAPPEARED",
+      "description": "Target bike has left its original parking zone and is no longer detected."
+    }
+  ]
+}

@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 
-def create_realistic_test_cctv(output_video_path: str = "sample_cctv_theft.mp4", duration_sec: int = 14, fps: int = 25):
+def create_realistic_test_cctv(output_video_path: str = "tests/videos/sample_test_cctv.mp4", duration_sec: int = 14, fps: int = 25):
     """
     Synthesize an authentic-looking CCTV video:
     - CCTV camera timestamp and camera ID overlay (e.g. CAM-04 REAR PARKING)
@@ -15,6 +15,7 @@ def create_realistic_test_cctv(output_video_path: str = "sample_cctv_theft.mp4",
     - Suspect approaching, interacting with the motorcycle, and riding off
     - Empty parking bay aftermath
     """
+    Path(output_video_path).parent.mkdir(parents=True, exist_ok=True)
     width, height = 960, 540
     total_frames = duration_sec * fps
     fourcc = cv2.VideoWriter_fourcc(*"mp4v")
@@ -35,7 +36,8 @@ def create_realistic_test_cctv(output_video_path: str = "sample_cctv_theft.mp4",
     cv2.putText(bg, "BAY 3", (690, 180), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (200, 200, 200), 2)
 
     # Load real motorcycle and person textures
-    moto_img = cv2.imread("test_motorcycle.jpg")
+    assets_dir = Path(__file__).parent / "assets"
+    moto_img = cv2.imread(str(assets_dir / "test_motorcycle.jpg"))
     if moto_img is not None:
         moto_resized = cv2.resize(moto_img, (180, 130))
     else:
@@ -45,7 +47,7 @@ def create_realistic_test_cctv(output_video_path: str = "sample_cctv_theft.mp4",
         cv2.circle(moto_resized, (145, 95), 30, (20, 20, 20), -1)
         cv2.rectangle(moto_resized, (35, 60), (145, 90), (0, 0, 200), -1)
 
-    person_src = cv2.imread("test_zidane.jpg")
+    person_src = cv2.imread(str(assets_dir / "test_zidane.jpg"))
     if person_src is not None:
         # Crop person from zidane
         person_crop = person_src[100:600, 150:450]
@@ -146,4 +148,4 @@ def create_realistic_test_cctv(output_video_path: str = "sample_cctv_theft.mp4",
 
 
 if __name__ == "__main__":
-    create_realistic_test_cctv("sample_test_cctv.mp4")
+    create_realistic_test_cctv("tests/videos/sample_test_cctv.mp4")

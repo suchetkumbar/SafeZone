@@ -1,0 +1,70 @@
+{
+  "incident_status": "STOLEN_OR_DEPARTED",
+  "target_bike": {
+    "track_id": 3,
+    "initial_bounding_box": [
+      549,
+      26,
+      608,
+      83
+    ],
+    "last_stationary_timestamp": 27.49999999999988,
+    "last_stationary_time_formatted": "00:00:27.500",
+    "departure_timestamp": 27.666666666666544,
+    "departure_time_formatted": "00:00:27.667"
+  },
+  "investigation_metrics": {
+    "total_frames_analyzed": 324,
+    "total_duration_seconds": 53.83333333333377,
+    "duration_formatted": "00:00:53.833"
+  },
+  "primary_suspect": {
+    "track_id": 4,
+    "first_contact_ts": 26.999999999999886,
+    "first_contact_formatted": "00:00:27.000",
+    "last_contact_ts": 45.166666666666856,
+    "last_contact_formatted": "00:00:45.167",
+    "interaction_duration_seconds": 18.16666666666697,
+    "suspicion_confidence_score": 1.0,
+    "action": "Interacted with bike at departure"
+  },
+  "associated_persons": [
+    {
+      "track_id": 7,
+      "first_contact_ts": 46.50000000000023,
+      "last_contact_ts": 49.0000000000003,
+      "suspicion_confidence_score": 0.4,
+      "action": "Approached parked bike"
+    }
+  ],
+  "timeline": [
+    {
+      "timestamp": 26.833333333333222,
+      "time_str": "00:00:26.833",
+      "frame_idx": 322,
+      "type": "TARGET_LOCKED",
+      "description": "Target bicycle locked (Track ID #3)"
+    },
+    {
+      "timestamp": 26.999999999999886,
+      "time_str": "00:00:27.000",
+      "frame_idx": 324,
+      "type": "PERSON_APPROACHED",
+      "description": "Person (ID #4) entered bike interaction zone (dist: 0.0px)"
+    },
+    {
+      "timestamp": 27.666666666666544,
+      "time_str": "00:00:27.667",
+      "frame_idx": 332,
+      "type": "DEPARTURE_DETECTED",
+      "description": "Target bike in motion! Displacement: 67.9px from parking spot."
+    },
+    {
+      "timestamp": 46.50000000000023,
+      "time_str": "00:00:46.500",
+      "frame_idx": 558,
+      "type": "PERSON_APPROACHED",
+      "description": "Person (ID #7) entered bike interaction zone (dist: 0.0px)"
+    }
+  ]
+}

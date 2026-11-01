@@ -2,6 +2,7 @@
 import sys
 import argparse
 import cv2
+import re
 from pathlib import Path
 from typing import Optional, Tuple
 from rich.console import Console
@@ -58,14 +59,14 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  # Fast scan with interactive ROI selection:
-  biketrace scan path/to/cctv.mp4 --select-roi
+  # Scan a recording placed in the project data folder:
+  python run_forensics.py data/example.mp4
 
-  # Scan a folder of DVR 15-minute chunk videos:
-  biketrace scan D:/CCTV_Backups/2026-10-31/ --fast
+  # Optional target zone and scan settings:
+  python run_forensics.py data/example.webm --roi 350,180,620,410 --stride 5 --no-video
 
-  # Scan using a reference photo of the stolen scooter:
-  biketrace scan cctv_corridor.mp4 --ref-image my_activa_red.jpg
+  # Explicit subcommand and output override are also supported:
+  biketrace scan data/example.mkv --output-dir output/case-01
 
   # Scan directly from a Dahua or Hikvision live RTSP stream:
   biketrace scan "rtsp://admin:pass123@192.168.1.108:554/cam/realmonitor?channel=1&subtype=0"
@@ -88,7 +89,11 @@ Examples:
     scan_parser.add_argument("--stride", type=int, default=2, help="Frame stride when quiet (default: 2)")
     scan_parser.add_argument("--no-fast", action="store_true", help="Disable motion gating (scan every frame)")
     scan_parser.add_argument("--no-video", action="store_true", help="Disable generating annotated video for faster execution")
-    scan_parser.add_argument("--output-dir", default="forensics_output", help="Directory to save report and snapshots")
+    scan_parser.add_argument("--output-dir", help="Directory to save report and snapshots (default: output/<video-name>)")
+
+    # Also accept a video path as the first argument for a one-command workflow.
+    if len(sys.argv) > 1 and sys.argv[1] not in {"scan", "test-rtsp", "build-rtsp", "-h", "--help"}:
+        sys.argv.insert(1, "scan")
 
     # Command: test-rtsp
     rtsp_parser = subparsers.add_parser("test-rtsp", help="Test connectivity to an RTSP stream")
@@ -133,9 +138,10 @@ Examples:
         sys.exit(0)
 
     if args.command == "scan":
+        source_path = args.source
         target_roi = None
         if args.select_roi:
-            target_roi = interactive_select_roi(args.source)
+            target_roi = interactive_select_roi(source_path)
         elif args.roi:
             target_roi = parse_roi_str(args.roi)
 
@@ -145,9 +151,16 @@ Examples:
             ref_image_path=args.ref_image,
         )
 
+        output_dir = args.output_dir
+        if output_dir is None:
+            source = Path(source_path)
+            video_name = source.stem if source.suffix else source.name
+            safe_name = re.sub(r"[^A-Za-z0-9._-]+", "_", video_name).strip("._") or "cctv_recording"
+            output_dir = str(Path("output") / safe_name)
+
         cfg = ForensicsConfig(
-            source=args.source,
-            output_dir=args.output_dir,
+            source=source_path,
+            output_dir=output_dir,
             model_name=args.model,
             device=args.device,
             fast_mode=not args.no_fast,

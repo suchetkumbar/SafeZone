@@ -1,0 +1,70 @@
+{
+  "incident_status": "STOLEN_OR_DEPARTED",
+  "target_bike": {
+    "track_id": 1,
+    "initial_bounding_box": [
+      486,
+      314,
+      577,
+      377
+    ],
+    "last_stationary_timestamp": 9.759999999999968,
+    "last_stationary_time_formatted": "00:00:09.760",
+    "departure_timestamp": 9.839999999999966,
+    "departure_time_formatted": "00:00:09.840"
+  },
+  "investigation_metrics": {
+    "total_frames_analyzed": 175,
+    "total_duration_seconds": 13.91999999999988,
+    "duration_formatted": "00:00:13.920"
+  },
+  "primary_suspect": {
+    "track_id": 4,
+    "first_contact_ts": 9.519999999999973,
+    "first_contact_formatted": "00:00:09.520",
+    "last_contact_ts": 11.99999999999992,
+    "last_contact_formatted": "00:00:12.000",
+    "interaction_duration_seconds": 2.479999999999947,
+    "suspicion_confidence_score": 1.0,
+    "action": "Interacted with bike at departure"
+  },
+  "associated_persons": [
+    {
+      "track_id": 2,
+      "first_contact_ts": 0.0,
+      "last_contact_ts": 8.479999999999995,
+      "suspicion_confidence_score": 0.4,
+      "action": "Approached parked bike"
+    }
+  ],
+  "timeline": [
+    {
+      "timestamp": 0.0,
+      "time_str": "00:00:00.000",
+      "frame_idx": 0,
+      "type": "TARGET_LOCKED",
+      "description": "Target motorcycle locked (Track ID #1)"
+    },
+    {
+      "timestamp": 0.0,
+      "time_str": "00:00:00.000",
+      "frame_idx": 0,
+      "type": "PERSON_APPROACHED",
+      "description": "Person (ID #2) entered bike interaction zone (dist: 0.0px)"
+    },
+    {
+      "timestamp": 9.519999999999973,
+      "time_str": "00:00:09.520",
+      "frame_idx": 238,
+      "type": "PERSON_APPROACHED",
+      "description": "Person (ID #4) entered bike interaction zone (dist: 0.0px)"
+    },
+    {
+      "timestamp": 9.839999999999966,
+      "time_str": "00:00:09.840",
+      "frame_idx": 246,
+      "type": "DEPARTURE_DETECTED",
+      "description": "Target bike in motion! Displacement: 69.5px from parking spot."
+    }
+  ]
+}

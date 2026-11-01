@@ -39,6 +39,7 @@ with st.sidebar:
     input_mode = st.radio("Input Source Type", ["Upload Video File", "Local File / Directory Path", "RTSP / Live Stream"])
 
     source_path = ""
+    output_name = ""
     temp_file_path = None
 
     if input_mode == "Upload Video File":
@@ -48,9 +49,11 @@ with st.sidebar:
             tfile.write(uploaded_file.read())
             temp_file_path = tfile.name
             source_path = temp_file_path
+            output_name = Path(uploaded_file.name).stem
             st.success(f"Loaded: {uploaded_file.name}")
     elif input_mode == "Local File / Directory Path":
-        source_path = st.text_input("Local File Path or DVR Chunk Folder", value="sample_test_cctv.mp4")
+        source_path = st.text_input("Local File Path or DVR Chunk Folder", value="data/example.mp4")
+        output_name = Path(source_path).stem or Path(source_path).name
         st.caption("Supports single video or folder of segmented 15-min DVR clips.")
     else:
         st.subheader("RTSP Stream Builder")
@@ -65,6 +68,7 @@ with st.sidebar:
             brand=brand, ip=cam_ip, user=cam_user, password=cam_pass, channel=cam_ch, sub_stream=sub_stream
         )
         source_path = st.text_input("Live Stream URL", value=constructed_url)
+        output_name = "live_camera"
 
     st.markdown("---")
     st.header("🎯 Target 2-Wheeler Setup")
@@ -139,8 +143,8 @@ if st.button("🚀 Start Forensics Investigation", type="primary", use_container
         ref_image_path=ref_img_path
     )
 
-    out_dir = Path("forensics_output")
-    out_dir.mkdir(exist_ok=True)
+    out_dir = Path("output") / (output_name or Path(source_path).stem or "cctv_recording")
+    out_dir.mkdir(parents=True, exist_ok=True)
 
     cfg = ForensicsConfig(
         source=source_path,

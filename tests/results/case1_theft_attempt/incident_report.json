@@ -1,0 +1,39 @@
+{
+  "incident_status": "STOLEN_OR_DEPARTED",
+  "target_bike": {
+    "track_id": 3,
+    "initial_bounding_box": [
+      545,
+      192,
+      666,
+      408
+    ],
+    "last_stationary_timestamp": 23.61538461538489,
+    "last_stationary_time_formatted": "00:00:23.615",
+    "departure_timestamp": 23.69230769230797,
+    "departure_time_formatted": "00:00:23.692"
+  },
+  "investigation_metrics": {
+    "total_frames_analyzed": 391,
+    "total_duration_seconds": 30.000000000000547,
+    "duration_formatted": "00:00:30.000"
+  },
+  "primary_suspect": null,
+  "associated_persons": [],
+  "timeline": [
+    {
+      "timestamp": 22.461538461538687,
+      "time_str": "00:00:22.462",
+      "frame_idx": 584,
+      "type": "TARGET_LOCKED",
+      "description": "Target motorcycle locked (Track ID #3)"
+    },
+    {
+      "timestamp": 23.69230769230797,
+      "time_str": "00:00:23.692",
+      "frame_idx": 616,
+      "type": "TARGET_DISAPPEARED",
+      "description": "Target bike has left its original parking zone and is no longer detected."
+    }
+  ]
+}
